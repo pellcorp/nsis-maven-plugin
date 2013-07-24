@@ -1,0 +1,42 @@
+ ------
+ Introduction
+ ------
+ ------
+ ------
+
+NSIS Maven Plugin
+
+  The nsis-maven-plugin enables Maven integration with the NSIS tools
+  so that Windows and Linux build machines can create Windows Installer EXEs.
+
+* Goals Overview
+
+  * {{{./generate-project-mojo.html}nsis:generate-project}} Generate a project.nsh containing NSIS variables that represent the common POM values.
+
+  * {{{./compile-mojo.html}nsis:compile}} Compile the setup.nsi into an installer executable.
+
+  []
+
+* Usage
+
+  General instructions on how to use the NSIS Maven Plugin can be found on the {{{./usage.html}usage page}}.
+
+  In case you still have questions regarding the plugin's usage, please feel
+  free to contact the {{{./mail-lists.html}user mailing list}}. The posts to the mailing list are archived and could
+  already contain the answer to your question as part of an older thread. Hence, it is also worth browsing/searching
+  the {{{./mail-lists.html}mail archive}}.
+
+  If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our
+  {{{./issue-tracking.html}issue tracker}}. When creating a new issue, please provide a comprehensive description of your
+  concern. Especially for fixing bugs it is crucial that the developers can reproduce your problem. For this reason,
+  entire debug logs, POMs or most preferably little demo projects attached to the issue are very much appreciated.
+  Of course, patches are most welcome too. Contributors can check out the project from our
+  {{{./source-repository.html}source repository}} and will find supplementary information in the
+  {{{http://maven.apache.org/guides/development/guide-helping.html}guide to helping with Maven}}. 
+
+
+* Examples
+
+  * {{{./examples/sample-nsis-project.html}Sample NSIS Project.}}
+
+  []
