@@ -50,7 +50,20 @@ public class MakeMojo
     extends AbstractMojo
     implements ProcessOutputConsumer
 {
-
+	/**
+	 * Indicates if the execution should be disabled. If true, nothing will
+	 * occur during execution.
+	 */
+	@Parameter( property = "nsis.disabled", defaultValue = "false" )
+	private boolean disabled;
+	
+	/**
+	 * Attach Artifact Flag - can generate non installer artifact, such as an exe, that should
+	 * not be attached.
+	 */
+	@Parameter( property = "nsis.setup.attachArtifact", defaultValue = "true" )
+	private boolean attachArtifact;
+	
     /**
      * The binary to execute for makensis. Default assumes that the makensis can be found in the path.
      */
@@ -100,6 +113,11 @@ public class MakeMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+    	if (disabled) {
+			getLog().info("MOJO is disabled. Doing nothing.");
+			return;
+		}
+    	
         validate();
         List<String> commands = new ArrayList<String>();
         commands.add( makensisBin ); // The makensis binary
@@ -176,8 +194,10 @@ public class MakeMojo
                                                   "Execution of makensis compiler failed. See output above for details." );
             }
 
-            // Attach the exe to the install tasks.
-            projectHelper.attachArtifact( project, "exe", classifier, targetFile );
+            if (attachArtifact) {
+            	// Attach the exe to the install tasks.
+            	projectHelper.attachArtifact( project, "exe", classifier, targetFile );
+            }
         }
         catch ( IOException e )
         {

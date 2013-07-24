@@ -64,6 +64,12 @@ public class GenerateHeaderfileMojo
     @Parameter( defaultValue = "${project}", required = true, readonly = true )
     private MavenProject project;
 
+    /**
+	 * Additional variables that are to be written to the project.nsh file
+	 */
+    @Parameter
+	private Variable[] variables;
+	
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -125,6 +131,13 @@ public class GenerateHeaderfileMojo
             {
                 writer.println( "; The project organization section is missing from your pom.xml" );
             }
+            
+    		if (variables != null) {
+    			for (Variable variable : variables) {
+    				writer.println("!define PROJECT_{0} \"{1}\"", variable.getKey().toUpperCase(),
+    						variable.getValue());
+    			}
+        	}
         }
         catch ( IOException e )
         {
