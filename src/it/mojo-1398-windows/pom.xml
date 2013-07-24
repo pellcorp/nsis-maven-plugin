@@ -10,7 +10,7 @@
             <artifactId>nsis-maven-plugin</artifactId>
             <version>@project.version@</version>
             <configuration>
-                <outputFile>nsis-bundle\setup.exe</outputFile>
+                <outputFile>nsis-bundle/setup.exe</outputFile>
             </configuration>
             <executions>
 	          <execution>
