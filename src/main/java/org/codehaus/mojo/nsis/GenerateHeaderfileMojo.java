@@ -44,8 +44,6 @@ import org.codehaus.plexus.util.StringUtils;
  * <pre>
  *   !include target\project.nsh
  * </pre>
- * 
- * @author <a href="mailto:joakime@apache.org">Joakim Erdfelt</a>
  */
 @Mojo( name = "generate-headerfile", defaultPhase = LifecyclePhase.PREPARE_PACKAGE )
 public class GenerateHeaderfileMojo

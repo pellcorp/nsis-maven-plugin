@@ -17,6 +17,7 @@
 package org.codehaus.mojo.nsis;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -39,6 +40,8 @@ import org.codehaus.mojo.nsis.io.ProcessOutputHandler;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.io.InputStreamFacade;
+import org.codehaus.plexus.util.io.RawInputStreamFacade;
 
 /**
  * Compile the <code>setup.nsi</code> into an installer executable.
@@ -50,6 +53,8 @@ public class MakeMojo
     extends AbstractMojo
     implements ProcessOutputConsumer
 {
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	
 	/**
 	 * Indicates if the execution should be disabled. If true, nothing will
 	 * occur during execution.
@@ -70,6 +75,13 @@ public class MakeMojo
     @Parameter( property = "nsis.makensis.bin", defaultValue = "makensis", required = true )
     private String makensisBin;
 
+
+    /**
+     * Compression settings
+     */
+    @Parameter( required = false )
+    private Compression compression;
+    
     /**
      * The main setup script.
      */
@@ -122,7 +134,8 @@ public class MakeMojo
         List<String> commands = new ArrayList<String>();
         commands.add( makensisBin ); // The makensis binary
 
-        File targetFile = getOutputFile( new File( project.getBuild().getDirectory() ), outputFile, classifier );
+        File buildDirectory =  new File( project.getBuild().getDirectory() );
+        File targetFile = getOutputFile( buildDirectory, outputFile, classifier );
 
         File targetDirectory = targetFile.getParentFile();
 
@@ -141,12 +154,16 @@ public class MakeMojo
         }
 
         String optPrefix = ( isWindows ) ? "/" : "-";
-        commands.add( optPrefix + "X" + "OutFile " + StringUtils.quoteAndEscape( targetFile.getAbsolutePath(), '\'' ) ); // The
-                                                                                                                         // installer
-                                                                                                                         // output
-                                                                                                                         // file
+
+        // The installer output file
+        commands.add( optPrefix + "X" + "OutFile " + StringUtils.quoteAndEscape( targetFile.getAbsolutePath(), '\'' ) );
+        
         commands.add( optPrefix + "V2" ); // Verboseness Level
-        commands.add( scriptFile ); // The setup script file
+        
+        File actualScriptFile = processInputFile(buildDirectory);
+        
+        getLog().debug("Processing Script file: " + actualScriptFile.getAbsolutePath());
+        commands.add( actualScriptFile.getAbsolutePath() ); // The setup script file
 
         ProcessBuilder builder = new ProcessBuilder( commands );
         builder.directory( project.getBasedir() ); // The working directory
@@ -235,6 +252,35 @@ public class MakeMojo
         finally
         {
             IOUtil.close( reader );
+        }
+    }
+    
+    private File processInputFile(File basedir) throws MojoExecutionException {
+    	try
+        {
+	    	File scriptFileFile = new File(scriptFile);
+	    	File file = new File(basedir, scriptFileFile.getName());
+	    	
+	    	if (compression != null) {
+	    		String contents = FileUtils.fileRead(scriptFileFile);
+	    		StringBuffer buf = new StringBuffer();
+	    		buf.append("SetCompressor " + compression.getType().name());
+	    		if (compression.isDoFinal()) {
+	    			buf.append(" /FINAL");
+	    		}
+	    		if (compression.isDoSolid()) {
+	    			buf.append(" /SOLID");
+	    		}
+	    		buf.append(LINE_SEPARATOR);
+	    		buf.append(contents);
+	    		InputStreamFacade is = new RawInputStreamFacade(new ByteArrayInputStream(buf.toString().getBytes("UTF-8")));
+	    		FileUtils.copyStreamToFile(is, file);
+	    	} else {
+	    		FileUtils.copyFile(scriptFileFile, file);
+	    	}
+	    	return file;
+        } catch (IOException e) {
+        	throw new MojoExecutionException( "Unable to copy file", e );
         }
     }
     
