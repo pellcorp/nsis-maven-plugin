@@ -271,14 +271,16 @@ public class MakeMojo
 	    	if (compression != null && !compression.isDefault()) {
 	    		String contents = FileUtils.fileRead(scriptFileFile);
 	    		StringBuffer buf = new StringBuffer();
-	    		buf.append("SetCompressor " + compression.getType().name());
+	    		buf.append("SetCompressor");
 	    		if (compression.isDoFinal()) {
 	    			buf.append(" /FINAL");
 	    		}
 	    		if (compression.isDoSolid()) {
 	    			buf.append(" /SOLID");
 	    		}
+	    		buf.append(" " + compression.getType().name());
 	    		buf.append(LINE_SEPARATOR);
+	    		
 	    		buf.append("SetCompressorDictSize " + compression.getDictionarySize());
 	    		buf.append(LINE_SEPARATOR);
 	    		
