@@ -264,7 +264,7 @@ public class MakeMojo
     private File processInputFile() throws MojoExecutionException {
     	try
         {
-	    	File scriptFileFile = new File(project.getBasedir(), scriptFile);
+	    	File scriptFileFile = new File(scriptFile);
 	    	File file = new File(project.getBuild().getDirectory(), scriptFileFile.getName());
 	    	
 	    	// ignore setting for 
