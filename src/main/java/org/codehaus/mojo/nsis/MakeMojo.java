@@ -161,7 +161,7 @@ public class MakeMojo
         
         commands.add( optPrefix + "V2" ); // Verboseness Level
         
-        File actualScriptFile = processInputFile(buildDirectory);
+        File actualScriptFile = processInputFile();
         
         getLog().debug("Processing Script file: " + actualScriptFile.getAbsolutePath());
         commands.add( actualScriptFile.getAbsolutePath() ); // The setup script file
@@ -261,11 +261,11 @@ public class MakeMojo
         }
     }
     
-    private File processInputFile(File basedir) throws MojoExecutionException {
+    private File processInputFile() throws MojoExecutionException {
     	try
         {
-	    	File scriptFileFile = new File(scriptFile);
-	    	File file = new File(basedir, scriptFileFile.getName());
+	    	File scriptFileFile = new File(project.getBasedir(), scriptFile);
+	    	File file = new File(project.getBuild().getDirectory(), scriptFileFile.getName());
 	    	
 	    	// ignore setting for 
 	    	if (compression != null && !compression.isDefault()) {

@@ -9,7 +9,7 @@
   </parent>
   
   <artifactId>nsis-maven-plugin</artifactId>
-  <version>1.0-alpha-3-pellcorp</version>
+  <version>1.0-alpha-4-pellcorp</version>
   <packaging>maven-plugin</packaging>
   <name>Mojo's Maven Plugin for NSIS</name>
 
