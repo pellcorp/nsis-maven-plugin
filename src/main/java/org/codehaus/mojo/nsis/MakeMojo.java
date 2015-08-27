@@ -35,6 +35,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.mojo.nsis.Compression.Type;
 import org.codehaus.mojo.nsis.io.ProcessOutputConsumer;
 import org.codehaus.mojo.nsis.io.ProcessOutputHandler;
 import org.codehaus.plexus.util.FileUtils;
@@ -53,7 +54,7 @@ public class MakeMojo
     extends AbstractMojo
     implements ProcessOutputConsumer
 {
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String LINE_SEPARATOR = "\r\n";
 	
 	/**
 	 * Indicates if the execution should be disabled. If true, nothing will
@@ -189,6 +190,7 @@ public class MakeMojo
         
         try
         {
+        	long start = System.currentTimeMillis();
             Process process = builder.start();
             ProcessOutputHandler output = new ProcessOutputHandler( process.getInputStream(), this );
             output.startThread();
@@ -211,6 +213,10 @@ public class MakeMojo
                                                   "Execution of makensis compiler failed. See output above for details." );
             }
 
+            long end = System.currentTimeMillis();
+            
+            consumeOutputLine("Execution completed in " + (end - start) + "ms");
+            
             if (attachArtifact) {
             	// Attach the exe to the install tasks.
             	projectHelper.attachArtifact( project, "exe", classifier, targetFile );
@@ -261,7 +267,8 @@ public class MakeMojo
 	    	File scriptFileFile = new File(scriptFile);
 	    	File file = new File(basedir, scriptFileFile.getName());
 	    	
-	    	if (compression != null) {
+	    	// ignore setting for 
+	    	if (compression != null && !compression.isDefault()) {
 	    		String contents = FileUtils.fileRead(scriptFileFile);
 	    		StringBuffer buf = new StringBuffer();
 	    		buf.append("SetCompressor " + compression.getType().name());
@@ -271,6 +278,10 @@ public class MakeMojo
 	    		if (compression.isDoSolid()) {
 	    			buf.append(" /SOLID");
 	    		}
+	    		buf.append(LINE_SEPARATOR);
+	    		buf.append("SetCompressorDictSize " + compression.getDictionarySize());
+	    		buf.append(LINE_SEPARATOR);
+	    		
 	    		buf.append(LINE_SEPARATOR);
 	    		buf.append(contents);
 	    		InputStreamFacade is = new RawInputStreamFacade(new ByteArrayInputStream(buf.toString().getBytes("UTF-8")));
